@@ -1,0 +1,41 @@
+name: Data Processing Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  download-and-process-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Download dataset
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          mkdir -p data
+          curl -L -o data/archive.zip https://www.kaggle.com/api/v1/datasets/download/bwandowando/tomtom-traffic-data-55-countries-387-cities
+
+      - name: Run data processing script
+        run: |
+          python process_data.py
+
+      - name: List all files in data folder
+        run: |
+          echo "Listing all files in the data folder:"
+          ls -R data
