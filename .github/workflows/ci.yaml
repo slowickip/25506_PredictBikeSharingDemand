@@ -9,6 +9,7 @@ on:
 jobs:
   download-and-process-data:
     runs-on: ubuntu-latest
+    timeout-minutes: 120  # Set the timeout to 120 minutes
 
     steps:
       - name: Checkout code
@@ -17,25 +18,24 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.8'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
       - name: Download dataset
-        env:
-          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: |
-          mkdir -p data
-          curl -L -o data/archive.zip https://www.kaggle.com/api/v1/datasets/download/bwandowando/tomtom-traffic-data-55-countries-387-cities
+          curl -L -o archive.zip https://www.kaggle.com/api/v1/datasets/download/bwandowando/tomtom-traffic-data-55-countries-387-cities
+          unzip -o archive.zip -d dataset
+          rm archive.zip
 
       - name: Run data processing script
         run: |
           python process_data.py
 
-      - name: List all files in data folder
-        run: |
-          echo "Listing all files in the data folder:"
-          ls -R data
+#      - name: Upload plots as artifacts
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: plots
+#          path: plots/*

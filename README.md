@@ -72,3 +72,49 @@ Dane te umożliwiają analizę wpływu różnych czynników zewnętrznych, takic
 7. **Prezentacja i raport końcowy**:
    - **Przygotowanie prezentacji wyników**: stworzenie wizualizacji i dashboardów pokazujących wyniki modelu.
    - **Opracowanie raportu końcowego**: dokumentacja wyników projektu i analiza końcowa.
+
+
+### Analiza automatycznego raportu
+
+#### Podstawowe informacje o danych
+- **Liczba wierszy**: 429544
+- **Liczba kolumn**: 12
+- **Typy danych**: 8 kolumn typu `float64`, 4 kolumny typu `object`
+- **Brakujące wartości**: Brak brakujących wartości
+
+#### Rozkłady zmiennych numerycznych
+- **JamsDelay**: Średnia wartość to 185.29, z dużym odchyleniem standardowym 585.23. Wartości wahają się od 0 do 15568.6.
+- **TrafficIndexLive**: Średnia wartość to 0.70, z odchyleniem standardowym 1.10. Wartości wahają się od -11.70 do 20.50.
+- **JamsLengthInKms**: Średnia wartość to 0.70, z odchyleniem standardowym 1.10. Wartości wahają się od -11.70 do 20.50.
+- **JamsCount**: Średnia wartość to 0.70, z odchyleniem standardowym 1.10. Wartości wahają się od -11.70 do 20.50.
+- **TrafficIndexWeekAgo**: Średnia wartość to 0.70, z odchyleniem standardowym 1.10. Wartości wahają się od -11.70 do 20.50.
+- **TravelTimeLivePer10KmsMins**: Średnia wartość to 0.70, z odchyleniem standardowym 1.10. Wartości wahają się od -11.70 do 20.50.
+- **TravelTimeHistoricPer10KmsMins**: Średnia wartość to 0.70, z odchyleniem standardowym 1.10. Wartości wahają się od -11.70 do 20.50.
+- **MinsDelay**: Średnia wartość to 0.70, z odchyleniem standardowym 1.10. Wartości wahają się od -11.70 do 20.50.
+
+#### Korelacje
+- **JamsCount** jest wysoko skorelowany z **JamsDelay** i 6 innymi polami.
+- **JamsDelay** jest wysoko skorelowany z **JamsCount** i 6 innymi polami.
+- **JamsLengthInKms** jest wysoko skorelowany z **JamsCount** i 5 innymi polami.
+- **MinsDelay** jest wysoko skorelowany z **JamsCount** i 5 innymi polami.
+- **TrafficIndexLive** jest wysoko skorelowany z **JamsCount** i 6 innymi polami.
+- **TrafficIndexWeekAgo** jest wysoko skorelowany z **JamsCount** i 6 innymi polami.
+- **TravelTimeHistoricPer10KmsMins** jest wysoko skorelowany z **JamsCount** i 4 innymi polami.
+- **TravelTimeLivePer10KmsMins** jest wysoko skorelowany z **JamsCount** i 6 innymi polami.
+
+#### Wartości unikalne
+- **TravelTimeLivePer10KmsMins** ma unikalne wartości.
+- **TravelTimeHistoricPer10KmsMins** ma unikalne wartości.
+- **MinsDelay** ma unikalne wartości.
+
+#### Wartości zerowe
+- **JamsDelay** ma 100348 (23.4%) wartości zerowych.
+- **TrafficIndexLive** ma 86114 (20.0%) wartości zerowych.
+- **JamsLengthInKms** ma 102197 (23.8%) wartości zerowych.
+- **JamsCount** ma 100348 (23.4%) wartości zerowych.
+- **TrafficIndexWeekAgo** ma 84268 (19.6%) wartości zerowych.
+
+### Notatki i obserwacje
+1. **Wysoka korelacja**: Wiele zmiennych jest wysoko skorelowanych z **JamsCount**, co może sugerować, że te zmienne są ze sobą powiązane i mogą wpływać na siebie nawzajem.
+2. **Wartości zerowe**: Znaczna liczba wartości zerowych w zmiennych takich jak **JamsDelay**, **TrafficIndexLive**, **JamsLengthInKms**, **JamsCount** i **TrafficIndexWeekAgo**. Może to wskazywać na brak ruchu lub brak danych w tych okresach.
+3. **Wartości unikalne**: Zmienne **TravelTimeLivePer10KmsMins**, **TravelTimeHistoricPer10KmsMins** i **MinsDelay** mają unikalne wartości, co może być istotne przy analizie szczegółowej.

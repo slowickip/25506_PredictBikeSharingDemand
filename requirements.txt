@@ -1,2 +1,11 @@
+autogluon.tabular
+cython
+numpy
 pandas
 scikit-learn
+matplotlib
+seaborn
+ydata-profiling
+pydantic-settings
+torch
+lightgbm
