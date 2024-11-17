@@ -33,9 +33,3 @@ jobs:
       - name: Run data processing script
         run: |
           python process_data.py
-
-#      - name: Upload plots as artifacts
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: plots
-#          path: plots/*
