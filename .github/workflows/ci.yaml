@@ -24,12 +24,14 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Download dataset
+      - name: Set up Airflow
         run: |
-          curl -L -o archive.zip https://www.kaggle.com/api/v1/datasets/download/bwandowando/tomtom-traffic-data-55-countries-387-cities
-          unzip -o archive.zip -d dataset
-          rm archive.zip
+          export AIRFLOW_HOME=~/airflow
+          mkdir -p $AIRFLOW_HOME/dags
+          cp ./dags/retrieve_dataset_dag.py $AIRFLOW_HOME/dags/
+          airflow db init
+          airflow standalone &> /tmp/airflow.log &
 
-      - name: Run data processing script
+      - name: Show Airflow DAG execution log
         run: |
-          python process_data.py
+          curl -s "http://localhost:8080/api/v1/dags/data_processing/dagRuns" -H "Content-Type: application/json" | jq '.'

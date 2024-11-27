@@ -16,6 +16,21 @@ from sklearn.model_selection import train_test_split
 # Load environment variables from .env file
 load_dotenv()
 
+# Constants
+DATASET_URL = 'https://www.kaggle.com/api/v1/datasets/download/bwandowando/tomtom-traffic-data-55-countries-387-cities'
+LOCAL_ZIP_PATH = '/tmp/archive.zip'
+EXTRACT_PATH = '/tmp/dataset'
+LOCAL_CSV_PATH = '/tmp/dataset/ForExport.csv'
+SAMPLE_SIZE = 50000
+TEST_SIZE = 0.3
+RANDOM_STATE = 42
+TRAIN_CSV_PATH = '/tmp/train.csv'
+TEST_CSV_PATH = '/tmp/test.csv'
+GOOGLE_SHEETS_CREDENTIALS_ENV = "GOOGLE_SHEETS_CREDENTIALS"
+SPREADSHEET_ID = "1ByNYGAETRPbHuB3oRQzljcOf7sGnk814pqLWiOHIxvo"
+TRAIN_SHEET_NAME = "Train"
+TEST_SHEET_NAME = "Test"
+
 # Default arguments for the DAG
 default_args = {
     'owner': 'airflow',
@@ -29,75 +44,62 @@ default_args = {
 
 # Define the DAG
 dag = DAG(
-    'data_processing',
+    dag_id='data_processing',
     default_args=default_args,
     description='A DAG to download, split, and upload data',
-    schedule_interval=timedelta(days=1),
+    schedule_interval=timedelta(minutes=1),
 )
 
 def download_dataset():
-    url = 'https://www.kaggle.com/api/v1/datasets/download/bwandowando/tomtom-traffic-data-55-countries-387-cities'
-    local_zip_path = '/tmp/archive.zip'
-    extract_path = '/tmp/dataset'
-
     # Download the dataset
-    response = requests.get(url, stream=True)
-    with open(local_zip_path, 'wb') as file:
+    response = requests.get(DATASET_URL, stream=True)
+    with open(LOCAL_ZIP_PATH, 'wb') as file:
         for chunk in response.iter_content(chunk_size=128):
             file.write(chunk)
 
     # Extract the dataset
-    with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_path)
+    with zipfile.ZipFile(LOCAL_ZIP_PATH, 'r') as zip_ref:
+        zip_ref.extractall(EXTRACT_PATH)
 
     # Clean up the zip file
-    os.remove(local_zip_path)
+    os.remove(LOCAL_ZIP_PATH)
 
 def split_dataset():
-    local_path = '/tmp/dataset/ForExport.csv'
-    df = pd.read_csv(local_path)
+    df = pd.read_csv(LOCAL_CSV_PATH)
     logging.info("Total rows count: {}".format(df.shape[0]))
-    df = df.sample(n=50000)
-    train, test = train_test_split(df, test_size=0.3, random_state=42)
-    train.to_csv('/tmp/train.csv', index=False)
-    test.to_csv('/tmp/test.csv', index=False)
+    df = df.sample(n=SAMPLE_SIZE)
+    train, test = train_test_split(df, test_size=TEST_SIZE, random_state=RANDOM_STATE)
+    train.to_csv(TRAIN_CSV_PATH, index=False)
+    test.to_csv(TEST_CSV_PATH, index=False)
 
 def upload_to_gsheets():
-    # Pobranie danych uwierzytelniających z sekretów środowiskowych
-    credentials_info = os.getenv("GOOGLE_SHEETS_CREDENTIALS")
+    credentials_info = os.getenv(GOOGLE_SHEETS_CREDENTIALS_ENV)
 
     if credentials_info is None:
         raise ValueError("GOOGLE_SHEETS_CREDENTIALS jest pusty.")
 
-    # Utwórz obiekt poświadczeń z JSON
     creds_dict = json.loads(credentials_info)
     scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
     creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
 
-    # Autoryzacja i połączenie z Google Sheets
     client = gspread.authorize(creds)
 
-    # Otwórz arkusz Google Sheets
-    spreadsheet_id = "1ByNYGAETRPbHuB3oRQzljcOf7sGnk814pqLWiOHIxvo"
-    logging.info("ID arkusza: {}".format(spreadsheet_id))
-    spreadsheet = client.open_by_key(spreadsheet_id)
-    trainSheet = spreadsheet.worksheet("Train")
-    testSheet = spreadsheet.worksheet("Test")
+    logging.info("ID arkusza: {}".format(SPREADSHEET_ID))
+    spreadsheet = client.open_by_key(SPREADSHEET_ID)
+    trainSheet = spreadsheet.worksheet(TRAIN_SHEET_NAME)
+    testSheet = spreadsheet.worksheet(TEST_SHEET_NAME)
 
-    # Wczytaj dane z plików CSV
     try:
-        train = pd.read_csv('/tmp/train.csv')
-        test = pd.read_csv('/tmp/test.csv')
+        train = pd.read_csv(TRAIN_CSV_PATH)
+        test = pd.read_csv(TEST_CSV_PATH)
         logging.info("Pliki CSV wczytane pomyślnie.")
     except FileNotFoundError as e:
         logging.error(f"Plik CSV nie został znaleziony: {e}")
         raise
 
-    # Konwersja danych na typ str
     train = train.astype(str)
     test = test.astype(str)
 
-    # Zapisz dane do Google Sheets
     trainSheet.clear()  # Wyczyszczenie arkusza przed zapisem nowych danych
     trainSheet.update(values=[train.columns.values.tolist()] + train.values.tolist(), range_name='')  # Zapisz dane do arkusza
 
@@ -126,8 +128,4 @@ upload_task = PythonOperator(
 )
 
 # Set the task dependencies
-# download_task >> split_task >> upload_task
-
-download_dataset()
-split_dataset()
-upload_to_gsheets()
+download_task >> split_task >> upload_task
