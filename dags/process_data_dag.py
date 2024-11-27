@@ -122,9 +122,4 @@ upload_task = PythonOperator(
 )
 
 # Set the task dependencies
-# download_task >> clean_task >> standardize_normalize_task >> upload_task
-
-download_data_from_gsheets()
-clean_data()
-standardize_and_normalize_data()
-upload_processed_data_to_gsheets()
+download_task >> clean_task >> standardize_normalize_task >> upload_task
