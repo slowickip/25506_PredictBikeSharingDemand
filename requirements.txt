@@ -1,11 +1,6 @@
-autogluon.tabular
-cython
-numpy
-pandas
+pandas~=2.2.3
+apache-airflow
+google-api-python-client~=2.154.0
 scikit-learn
-matplotlib
-seaborn
-ydata-profiling
-pydantic-settings
-torch
-lightgbm
+gspread
+python-dotenv
