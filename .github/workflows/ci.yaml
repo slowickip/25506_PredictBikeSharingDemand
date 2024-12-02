@@ -9,29 +9,54 @@ on:
 jobs:
   download-and-process-data:
     runs-on: ubuntu-latest
-    timeout-minutes: 120  # Set the timeout to 120 minutes
+    timeout-minutes: 120
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: '3.10'
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
 
-      - name: Install dependencies
+      - name: Set up Docker Compose
         run: |
-          pip install -r requirements.txt
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
 
-      - name: Set up Airflow
+      - name: Start Airflow with Docker Compose
         run: |
-          export AIRFLOW_HOME=~/airflow
-          mkdir -p $AIRFLOW_HOME/dags
-          cp ./dags/retrieve_dataset_dag.py $AIRFLOW_HOME/dags/
-          airflow db init
-          airflow standalone &> /tmp/airflow.log &
+          docker-compose build
+          docker-compose up -d
+          docker-compose ps
 
-      - name: Show Airflow DAG execution log
+      - name: Wait for Airflow to start
         run: |
-          curl -s "http://localhost:8080/api/v1/dags/data_processing/dagRuns" -H "Content-Type: application/json" | jq '.'
+          until curl -s http://localhost:8080/health | grep -q "healthy"; do
+              echo "Waiting for Airflow to start..."
+              sleep 5
+          done
+
+      - name: List all DAGs
+        run: |
+          docker-compose exec webserver airflow dags list
+          docker-compose exec webserver airflow dags list-import-errors
+
+      - name: Trigger retrieve_and_split_data DAG
+        run: |
+          docker-compose exec webserver airflow dags trigger retrieve_and_split_data
+
+      - name: Trigger clean_and_standardize_data DAG
+        run: |
+          docker-compose exec webserver airflow dags trigger --wait clean_and_standardize_data
+
+      - name: Show retrieve_and_split_data DAG execution log
+        run: |
+          docker-compose exec webserver airflow dags list-runs -d retrieve_and_split_data
+
+      - name: Show clean_and_standardize_data DAG execution log
+        run: |
+          docker-compose exec webserver airflow dags list-runs -d clean_and_standardize_data
+
+      - name: Display Airflow Logs
+        run: |
+          docker-compose logs

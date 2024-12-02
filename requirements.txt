@@ -1,7 +1,10 @@
-pandas~=2.2.3
+pandas
 apache-airflow
-google-api-python-client~=2.154.0
+google-api-python-client
 scikit-learn
 gspread
 python-dotenv
 graphviz
+requests
+protobuf
+psycopg2-binary
