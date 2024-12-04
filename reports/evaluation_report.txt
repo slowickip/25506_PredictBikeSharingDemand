@@ -1,0 +1,4 @@
+Mean Squared Error: 0.0015342944861900748
+Mean Absolute Error: 0.03653653524606006
+Mean Absolute Percentage Error: 42319068485.41761
+R^2 Score: 0.5132905847768103
