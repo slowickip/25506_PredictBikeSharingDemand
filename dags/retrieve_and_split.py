@@ -38,7 +38,7 @@ default_args = {
     'start_date': datetime(2023, 1, 1),
     'email_on_failure': False,
     'email_on_retry': False,
-    'retries': 1,
+    'retries': 0,
     'retry_delay': timedelta(minutes=5),
 }
 
@@ -47,7 +47,7 @@ dag = DAG(
     dag_id='retrieve_and_split_data',
     default_args=default_args,
     description='A DAG to download, split, and upload data',
-    schedule_interval=timedelta(minutes=1),
+    schedule_interval=None,
 )
 
 def download_dataset():
@@ -75,7 +75,7 @@ def split_dataset():
 def upload_to_gsheets():
     credentials_info = os.getenv(GOOGLE_SHEETS_CREDENTIALS_ENV)
 
-    if credentials_info is None:
+    if credentials_info is None or credentials_info == "":
         raise ValueError("GOOGLE_SHEETS_CREDENTIALS jest pusty.")
 
     creds_dict = json.loads(credentials_info)
