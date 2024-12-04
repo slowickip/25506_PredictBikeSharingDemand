@@ -8,3 +8,4 @@ graphviz
 requests
 protobuf
 psycopg2-binary
+tpot
