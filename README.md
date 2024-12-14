@@ -123,18 +123,9 @@ Dane te umożliwiają analizę wpływu różnych czynników zewnętrznych, takic
 
 ## Leaderboard
 
-| Model                  | Test Score | Validation Score | Evaluation Metric | Prediction Time (Test) | Prediction Time (Validation) | Fit Time   |
-|------------------------|------------|------------------|-------------------|------------------------|------------------------------|------------|
-| CatBoost               | 0.61196    | 0.59605          | r2                | 3.6373                 | 0.0852                       | 3579.8433  |
-| WeightedEnsemble_L2    | 0.61196    | 0.59605          | r2                | 3.7040                 | 0.0861                       | 3579.9645  |
-| LightGBM               | -0.86334   | -0.89146         | r2                | 0.1987                 | 0.0062                       | 8.2212     |
-| LightGBMXT             | -0.91043   | -0.95270         | r2                | 0.2758                 | 0.0058                       | 8.2586     |
-
----
-
-## Wnioski
-
-1. **Najlepszy model**: Model CatBoost osiągnął najlepsze wyniki zarówno na zbiorze testowym, jak i walidacyjnym, co czyni go najbardziej odpowiednim modelem do przewidywania poziomu zatłoczenia ruchu drogowego.
-2. **Wysoka korelacja zmiennych**: Wiele zmiennych jest wysoko skorelowanych z liczbą zatorów drogowych, co sugeruje, że te zmienne są ze sobą powiązane i mogą wpływać na siebie nawzajem.
-3. **Wartości zerowe**: Znaczna liczba wartości zerowych w zmiennych takich jak opóźnienia spowodowane zatorami i bieżący wskaźnik zatłoczenia może wskazywać na brak ruchu lub brak danych w tych okresach.
-4. **Wartości unikalne**: Zmienne dotyczące czasu przejazdu na 10 km mają unikalne wartości, co może być istotne przy analizie szczegółowej.
+| Metric                      | Value                |
+|-----------------------------|----------------------|
+| Mean Squared Error (MSE)    | 0.0015342944861900748 |
+| Mean Absolute Error (MAE)   | 0.03653653524606006   |
+| Mean Absolute Percentage Error (MAPE) | 42319068485.41761 |
+| R² Score                    | 0.5132905847768103   |
